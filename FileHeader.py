@@ -143,6 +143,23 @@ def get_strftime():
     return format
 
 
+def get_user_and_email():
+    '''Get user and email'''
+
+    user = getpass.getuser()
+    output, error = getOutputError(
+        'cd {0} && git status'.format(get_dir_path()))
+
+    if not error:
+        username, error = getOutputError('git config --get user.name')
+        if not error and username:
+            email, error = getOutputError('git config --get user.email')
+            if not error and email:
+                output = "{} - <{}>".format(username,email)
+                user = output
+    return user
+
+
 def get_user():
     '''Get user'''
 
@@ -259,11 +276,13 @@ def get_args(syntax_type, options={}):
         args.update({'project_name': get_project_name()})
 
     user = get_user()
+    user_and_email = get_user_and_email()
     if 'author' not in args:
         args.update({'author': user})
     if 'last_modified_by' not in args:
-        args.update({'last_modified_by': user})
-
+        args.update({'last_modified_by': user_and_email})
+    if 'author_and_email' not in args:
+        args.update({'author_and_email': user_and_email})
     return args
 
 
